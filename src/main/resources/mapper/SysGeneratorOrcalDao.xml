@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.xybc.dao.SysGeneratorOrcalDao">
+	<select id="queryList" resultType="map">
+		SELECT * FROM (
+		select b.TABLE_NAME ,'' , a.comments TABLE_COMMENT, c.CREATED  CREATE_TIME ,rownum rn
+		from user_tab_comments a,user_tables b, user_objects c
+		where a.table_name = b.table_name
+		and a.table_name = c.object_name
+		<if test="tableName != null and tableName.trim() != ''">
+			and b.table_name like '%'||#{tableName}|| '%'
+		</if>
+		order by c.CREATED desc) t
+		<if test="offset != null and limit != null">
+			 where t.rn &lt;=#{endSize} and t.rn>#{offset}
+		</if>
+	</select>
+	
+	<select id="queryTotal" resultType="int">
+		select count(1) from user_tables
+		<if test="tableName != null and tableName.trim() != ''">
+			where table_name like '%'||#{tableName}|| '%'
+		</if>
+
+	</select> 
+	
+	<select id="queryTable" resultType="map">
+		select b.TABLE_NAME,'' ENGINE, a.comments TABLE_COMMENT, b.LAST_ANALYZED CREATE_TIME
+		from user_tab_comments a,user_tables b
+		where a.table_name = b.table_name and a.table_name = #{tableName}
+	</select> 
+	
+	<select id="queryColumns" resultType="map">
+		select
+		  ut.COLUMN_NAME ,
+		  ut.DATA_TYPE ,
+		  uc.comments COLUMN_COMMENT,
+		  ''  COLUMN_KEY,
+		  '' EXTRA
+		from user_tab_columns  ut
+		inner JOIN user_col_comments uc
+		on ut.TABLE_NAME  = uc.table_name and ut.COLUMN_NAME = uc.column_name
+		where ut.Table_Name= #{tableName}
+	</select>
+</mapper>

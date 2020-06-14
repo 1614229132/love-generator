@@ -1,0 +1,70 @@
+<%@ page language="java" import="java.util.*" pageEncoding="utf-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib prefix="shiro" uri="http://shiro.apache.org/tags" %>
+<%@ include file="/common/no-cache.jsp" %>
+
+<div class="subcontBox; border-bottom: 0px" >
+    <div class="frmborder">
+        <table  class="gridtable" style="width:100%; padding-left:40px;padding-right:40px; padding-bottom:40px;">
+#foreach($column in $columns)
+#if($column.columnName != $pk.columnName )
+            <tr>
+                <th style="width:20%;">${column.comments}</th>
+                <td><input id="${column.attrname}I"  class="longInt" style="width:470px;" /></td>
+            </tr>
+#end
+#end
+        </table>
+    </div>
+</div>
+<div id="srvUDLGI"></div>
+<script type="text/javascript">
+
+
+    function add${className}(){
+        $.ajax({
+            type: "post",
+            url: "<%=path%>/rest/${classname}/data/add${className}",
+            data:{
+#foreach($column in $columns)
+#if($column.columnName != $pk.columnName)
+                ${column.attrname} : $("#${column.attrname}I").val()#if($velocityCount != $columns.size()),
+#end
+#end
+#end
+
+            },
+            beforeSend: ajaxLoading,
+            success : function(data) {
+                if(data['retCode']==0){
+                    EasyUIShowMsg('温馨提示', '<h1 align="center">'+data['retInfo']+'</h1>');
+                    ajaxLoadEnd();
+                    reloadDgd();
+                    $("#srvUDLGI").remove();
+                    $("#dialog").dialog("close");
+                }else{
+                    ajaxLoadEnd();
+                    EasyUIShowMsg('温馨提示', '<h1 align="center">'+data['retInfo']+'</h1>');
+                    return false;
+                }
+            },error : function(data) {
+                ajaxLoadEnd();
+                EasyUIShowMsg('消息', '<h4 align="center">执行异常！</h4>','error');
+                return true;
+            }
+        });
+    }
+
+
+    function userSrvListI(idId,nameId){
+        var url = "<%=path %>/rest/base/userList?scope=1";
+        var title = "请选择责任人";
+        var divId = "#srvUDLGI";
+        var	width = "750";
+        var height = "580";
+        userDlg(divId,title,url,width,height,idId,nameId);
+    }
+
+
+</script>
+

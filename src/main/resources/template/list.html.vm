@@ -1,0 +1,168 @@
+<%@ page language="java" import="java.util.*" pageEncoding="utf-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib prefix="shiro" uri="http://shiro.apache.org/tags" %>
+<%@ include file="/common/no-cache.jsp" %>
+
+<script type="text/javascript" src="<%=path %>/resources/common/js/jquery-easyui/jquery.easyui.min.js"></script>
+<script src="<%=path %>/resources/common/js/jquery-easyui/easyui-lang-zh_CN.js"></script>
+<script type="text/javascript" src="<%=path%>/resources/common/js/satp.js?a=<%=Math.random()%>"></script>
+<link rel="stylesheet" type="text/css" href="<%=path %>/resources/common/css/satp.css?a=<%=Math.random()%>"></link>
+<script src="<%=path %>/resources/common/js/plugin/dropzone.min.js"></script>
+<link rel="stylesheet" type="text/css" href="<%=path %>/resources/common/css/dropzone.css"></link>
+<link rel="stylesheet" type="text/css" href="<%=path %>/resources/common/css/form.css"></link>
+
+<!--导航栏-->
+<div class="crumb" style="margin-bottom: 0px;">
+    <span><a href="#">${comments}</a></span>
+    <span><a href="#">${comments}列表</a></span>
+</div>
+<div>
+    <table class="searchTable">
+        <tr>
+#foreach($column in $columns)
+#if($column.columnName != $pk.columnName)
+            <th width="10%">${column.comments}：</th>
+            <td><input type="text" class="commonInt" id="${column.attrname}" style="width:100%;height:28px;"></td>
+#end
+#end
+            <td></td>
+            <td >
+                <input type="button" name="searchButton" value="查询" class="subBtn searchIcon" id="queryBtn">
+            </td>
+        </tr>
+    </table>
+</div>
+
+<!-- 操作按钮 -->
+<div id="sttb" style="height: auto;" class="datagrid-toolbar">
+    <div>
+        <a href="#" class="easyui-linkbutton" iconCls="icon-add" plain="true" onclick="add${className}Page()">
+            <font title="新增" class="dgbtn" style="color:white;" >新增</font>
+        </a>
+    </div>
+</div>
+
+<div id="${classname}Dgd"></div>
+
+<script type="text/javascript">
+    $(document).ready(function(){
+
+        $('#${classname}Dgd').datagrid({
+            url:'<%=path %>/rest/${classname}/data/${classname}List',
+            fitColumns:true,
+            toolBar: "#sttb",
+            pagination: true,
+            rownumbers:true,
+            singleSelect: true,
+            columns:[[
+				{field:'${pk.attrname}', title:'${pk.attrname}',width:10,align:'center',hidden:true},
+#foreach($column in $columns)
+#if($column.columnName != $pk.columnName)
+                {field:'${column.attrname}',  title:'${column.comments}',width:10,align:'center'}
+#end
+#end
+                {field:'opt',title:'操作',width:10,align:'center',
+                    formatter:function(value,row,index){
+                        var str = "";
+                            str += "<a href=\"javascript:update${className}Page('"+row.${pk.attrname}+"')\">修改</a> &nbsp;";
+                            str += "<a href=\"javascript:delete${className}data('"+row.${pk.attrname}+"')\">删除</a> ";
+                        return str;
+                    }
+                },
+            ]]
+        });
+
+        $("#queryBtn").click(function(){
+            reloadDgd();
+        });
+
+    });
+    function add${className}Page(){
+        var url = "<%=path%>/rest/${classname}/page/add${className}";
+        EasyUIOpenDialog('${comments}新增', url, 660, 420, true, true, '确定',function(){
+            add${className}();
+            reloadDgd();
+        }, '关闭',function(){
+            $("#srvUDLGI").remove();
+        });
+    };
+
+    function update${className}Page(${pk.attrname}){
+        var url = "<%=path%>/rest/${classname}/page/update${className}?${pk.attrname}="+${pk.attrname};
+        EasyUIOpenDialog('${comments}修改', url, 660, 420, true, true, '确定',function(){
+            update${className}();
+        }, '关闭',function(){
+            $("#srvUDLGU").remove();
+        });
+    };
+
+    function ${classname}DetailPage(authId){
+        var url = "<%=path%>/rest/${classname}/page/update${className}?${pk.attrname}="+${pk.attrname};
+        EasyUIOpenDialog('${comments}详情', url, 660, 420, true, true, '确定',function(){
+            updateScanAuth();
+            $("#srvUDLGU").remove();
+        }, '关闭',function(){
+            $("#srvUDLGU").remove();
+        });
+    };
+
+    function delete${className}data (${pk.attrname}){
+        var url = "<%=path%>/rest/${classname}/data/delete${className}?${pk.attrname}="+${pk.attrname};
+        EasyUIIsConfirm('温馨提示', '<h3 style="text-align:center;">您确定删除这条数据吗？</h3>',280, 150,
+                function() {
+                    $.ajax({
+                        type: "post",
+                        url: url,
+                        beforeSend: ajaxLoading,
+                        success : function(data) {
+                            if(data['retCode']==0){
+                                EasyUIShowMsg('温馨提示', '<h1 align="center">'+data['retInfo']+'</h1>');
+                                ajaxLoadEnd();
+                                reloadDgd();
+                            }else{
+                                ajaxLoadEnd();
+                                EasyUIShowMsg('温馨提示', '<h1 align="center">'+data['retInfo']+'</h1>');
+                                return false;
+                            }
+                        },error : function(data) {
+                            ajaxLoadEnd();
+                            EasyUIShowMsg('消息', '<h4 align="center">执行异常！</h4>','error');
+                            return true;
+                        }
+                    });
+                });
+
+    };
+
+    function reloadDgd(){
+        $('#${classname}Dgd').datagrid('reload',{
+#foreach($column in $columns)
+#if($column.columnName != $pk.columnName)
+		    ${column.attrname} : $("#${column.attrname}").val()#if($velocityCount != $columns.size()),
+#end
+#end
+#end
+
+        });
+    };
+    //日期格式化
+    function DateFormatter(value){
+        if(value==null || value==""){
+            return "";
+        }
+        var date = new Date(value);
+        var year = date.getFullYear().toString();
+        var month = (date.getMonth() + 1);
+        var day = date.getDate().toString();
+        var hour = date.getHours().toString();
+        var minutes = date.getMinutes().toString();
+        var seconds = date.getSeconds().toString();
+        if (month < 10) {month = "0" + month;}
+        if (day < 10) {day = "0" + day;}
+        if (hour < 10) {hour = "0" + hour;}
+        if (minutes < 10) {minutes = "0" + minutes;}
+        if (seconds < 10) {seconds = "0" + seconds;}
+        return year + "-" + month + "-" + day ;
+    };
+</script>
+

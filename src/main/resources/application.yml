@@ -1,0 +1,30 @@
+# Tomcat
+server:
+    tomcat:
+        max-threads: 10
+        min-spare-threads: 10
+    port: 80
+
+# mysql
+spring:
+    dbType: orcal
+    datasource:
+        type: com.alibaba.druid.pool.DruidDataSource
+        #driverClassName: com.mysql.jdbc.Driver
+        #url: jdbc:mysql://47.111.79.98:3306/satp-ms?useUnicode=true&characterEncoding=UTF-8
+        #username: satp
+        #password: asqw1234
+        driverClassName: oracle.jdbc.driver.OracleDriver
+        url: jdbc:oracle:thin:@114.55.252.20:1521:orcl
+        username: satp
+        password: asqw1234
+    jackson:
+        time-zone: GMT+8
+        date-format: yyyy-MM-dd HH:mm:ss
+    resources:
+            static-locations: classpath:/static/,classpath:/views/
+
+# Mybatis配置
+mybatis:
+    mapperLocations: classpath:mapper/**/*.xml
+

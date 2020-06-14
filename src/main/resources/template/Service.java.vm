@@ -1,0 +1,71 @@
+package ${package}.service;
+
+import javax.annotation.Resource;
+import org.springframework.stereotype.Service;
+import com.clove.engine.impl.db.feature.orm.mybatis.ClovePage;
+import ${satpPackage}.cfg.${Satp};
+import com.haichao.workflow.util.Common;
+import ${satpPackage}.entity.${className};
+import java.util.List;
+import java.util.Map;
+
+/**
+ * ${comments}
+ * 
+ * @author ${author}
+ * @email ${email}
+ * @date ${datetime}
+ */
+
+@Service("mg${className}Service")
+public class Mg${className}Service {
+	@Resource
+	private $Satp $satp;
+
+	public ${className} find${className}(${className} ${classname}) throws Exception{
+		return ${satp}.get${className}Service.find${className}(${classname});
+	}
+
+	public List<${className}> select${className}List(${className} ${classname}) throws Exception{
+		return ${satp}.get${className}Service.select${className}List(${classname});
+	}
+
+	public List<${className}> select${className}List(ClovePage<${className}> clovePage,${className} ${classname}) throws Exception{
+		return ${satp}.get${className}Service.select${className}List(clovePage,${classname});
+	}
+
+	public void save${className}(${className} ${classname}) throws Exception{
+#foreach($column in $columns)
+#if($column.columnName != $pk.columnName)
+#if($column.attrType == 'String')
+		if (Common.isEmpty(${classname}.get${column.attrName}())) {
+#else
+		if (${classname}.get${column.attrName}()==null) {
+#end
+			throw new Exception("${column.comments}不能为空");
+		}
+#end
+#end
+		${satp}.get${className}Service.save${className}(${classname});
+	}
+
+	public void update${className}(${className} ${classname}) throws Exception{
+#foreach($column in $columns)
+#if($column.columnName != $pk.columnName)
+#if($column.attrType == 'String')
+		if (Common.isEmpty(${classname}.get${column.attrName}())) {
+#else
+		if (${classname}.get${column.attrName}()==null) {
+#end
+			throw new Exception("${column.comments}不能为空");
+		}
+#end
+#end
+		${satp}.get${className}Service.update${className}(${classname});
+	}
+
+	public void delete${className}(${className} ${classname}) throws Exception{
+		${satp}.get${className}Service.delete${className}(${classname});
+	}
+
+}

@@ -1,0 +1,158 @@
+package ${package}.controller;
+
+import java.util.List;
+import java.util.Map;
+import javax.servlet.http.HttpServletRequest;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+import com.clove.engine.impl.db.feature.orm.mybatis.ClovePage;
+import com.haichao.firp.core.annotation.SystemLog;
+import com.haichao.firp.core.entity.DatagridResult;
+import com.haichao.firp.web.security.OperTypeSign;
+import com.haichao.satp.util.PageConvert;
+import com.haichao.sccp.base.controller.BaseController;
+import ${satpPackage}.entity.${className};
+import ${package}.service.Mg${className}Service;
+
+/**
+ * @author ${author}
+ * @email ${email}
+ * @date ${datetime}
+ */
+@Controller
+@RequestMapping("/${classname}Controller")
+public class Mg${className}Controller extends BaseController{
+	@Autowired
+	private Mg${className}Service ${classname}Service;
+
+	String BASE_PATH = "${basePath}";
+
+    @SystemLog(oper = OperTypeSign.PAGE, operDesc = "${comments}列表展示页面")
+    @RequestMapping(value = "/page/${classname}List")
+    public String ${classname}ListPage(HttpServletRequest request, Model model) {
+        return BASE_PATH+"${classname}List";
+    }
+
+    @SystemLog(oper = OperTypeSign.PAGE, operDesc = "${comments}新增页面")
+    @RequestMapping(value = "/page/add${className}")
+    public String add${className}Page(HttpServletRequest request, Model model) {
+        return BASE_PATH+"${classname}Add";
+    }
+
+
+    @SystemLog(oper = OperTypeSign.PAGE, operDesc = "${comments}修改页面")
+    @RequestMapping(value = "/page/update${className}")
+    public String update${className}Page(HttpServletRequest request, Model model) {
+        ${className} ${classname} = new ${className}();
+        ${classname} = getModel(${classname});
+        try {
+            ${classname} = ${classname}Service.find${className}(${classname});
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        model.addAttribute("${classname}",${classname});
+        return BASE_PATH+"${classname}Update";
+    }
+
+    @SystemLog(oper = OperTypeSign.PAGE, operDesc = "${comments}详情页面")
+    @RequestMapping(value = "/page/detail${className}")
+    public String detail${className}Page(HttpServletRequest request, Model model) {
+        ${className} ${classname} = new ${className}();
+        ${classname} = getModel(${classname});
+        try {
+            ${classname} = ${classname}Service.find${className}(${classname});
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        model.addAttribute("${classname}",${classname});
+        return BASE_PATH+"${classname}Detail";
+    }
+
+    @SystemLog(oper = OperTypeSign.QUERY, operDesc = "${comments}列表数据")
+    @RequestMapping(value = "/data/${classname}List" ,method = RequestMethod.POST ,produces="application/json;charset=UTF-8")
+    @ResponseBody
+    public DatagridResult ${classname}List(HttpServletRequest request, Model model) {
+        ClovePage<${className}> clovePage = PageConvert.getClovePage(request);
+        ${className} ${classname} = new ${className}();
+        ${classname} = getModel(${classname});
+        List<${className}> list = null;
+        try {
+            list = ${classname}Service.select${className}List(clovePage,${classname});
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        DatagridResult dResult = PageConvert.dataResult(clovePage, list);
+        return dResult;
+    }
+
+    @SystemLog(oper = OperTypeSign.ADD, operDesc = "${comments}新增")
+    @RequestMapping(value = "/data/add${className}")
+    @ResponseBody
+    public Map<String, Object> add${className}(HttpServletRequest request, Model model) {
+        Map<String, Object> ret = new HashMap<String, Object>();
+        int retCode = 0;
+        String retInfo = "操作成功";
+        try {
+            ${className} ${classname} = new ${className}();
+            ${classname} = getModel(${classname});
+            ${classname}Service.save${className}(${classname});
+        } catch (Exception e) {
+            retCode = -1;
+            retInfo = "操作异常：" + e.getMessage();
+            e.printStackTrace();
+        } finally {
+            ret.put("retCode", retCode);
+            ret.put("retInfo", retInfo);
+        }
+        return ret;
+    }
+
+    @SystemLog(oper = OperTypeSign.UPDATE, operDesc = "${comments}修改")
+    @RequestMapping(value = "/data/update${className}")
+    @ResponseBody
+    public Map<String, Object> update${className}(HttpServletRequest request, Model model) {
+        Map<String, Object> ret = new HashMap<String, Object>();
+        int retCode = 0;
+        String retInfo = "操作成功";
+        try {
+            ${className} ${classname} = new ${className}();
+            ${classname} = getModel(${classname});
+            ${classname}Service.update${className}(${classname});
+        } catch (Exception e) {
+            retCode = -1;
+            retInfo = "操作异常：" + e.getMessage();
+            e.printStackTrace();
+        } finally {
+            ret.put("retCode", retCode);
+            ret.put("retInfo", retInfo);
+        }
+        return ret;
+    }
+
+    @SystemLog(oper = OperTypeSign.DELETE, operDesc = "${comments}删除")
+    @RequestMapping(value = "/data/delete${className}")
+    @ResponseBody
+    public Map<String, Object> delete${className}(HttpServletRequest request, Model model) {
+        Map<String, Object> ret = new HashMap<String, Object>();
+        int retCode = 0;
+        String retInfo = "操作成功";
+        try {
+            ${className} ${classname} = new ${className}();
+            ${classname} = getModel(${classname});
+            ${classname}Service.delete${className}(${classname});
+        } catch (Exception e) {
+            retCode = -1;
+            retInfo = "操作异常：" + e.getMessage();
+            e.printStackTrace();
+        } finally {
+            ret.put("retCode", retCode);
+            ret.put("retInfo", retInfo);
+        }
+        return ret;
+    }
+
+}

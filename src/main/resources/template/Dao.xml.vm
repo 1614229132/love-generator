@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="${satpPackage}.entity.${className}">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="${satpPackage}.entity.${className}" id="${classname}Map">
+#foreach($column in $columns)
+        <result property="${column.attrname}" column="${column.columnName}"/>
+#end
+    </resultMap>
+
+	<select id="query${className}" resultMap="${classname}Map"  parameterType="${satpPackage}.entity.${className}">
+		select
+#foreach($column in $columns)
+           a.${column.columnName}#if($velocityCount != $columns.size()),
+#end
+#end
+
+		from ${prefix}${tableName} a where a.${pk.columnName} = #{${pk.attrname}}
+#foreach($column in $columns)
+#if($column.columnName != $pk.columnName )
+		 <if test="${column.attrname} !=null and ${column.attrname} !='' ">and a.${column.columnName} = #{${column.attrname}}</if>
+#end
+#end
+	</select>
+
+	<select id="${classname}List" resultMap="${classname}Map"   parameterType="${satpPackage}.entity.${className}">
+        select
+#foreach($column in $columns)
+			a.${column.columnName}#if($velocityCount != $columns.size()),
+#end
+#end
+
+        from ${prefix}${tableName} a
+		<where>
+#foreach($column in $columns)
+           <if test="${column.attrname} !=null and ${column.attrname} !='' ">and a.${column.columnName} = #{${column.attrname}}</if>
+#end
+        </where>
+	</select>
+
+	<insert id="insert${className}" parameterType="${satpPackage}.entity.${className}"#if($pk.extra == 'auto_increment') useGeneratedKeys="true" keyProperty="$pk.attrname"#end>
+		insert into ${prefix}${tableName}
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+#foreach($column in $columns)
+    		<if test="${column.attrname} !=null " >${column.columnName}#if($velocityCount != $columns.size()),#end</if>
+#end
+		</trim>
+		values
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+#foreach($column in $columns)
+    		<if test="${column.attrname} !=null " >#{$column.attrname}#if($velocityCount != $columns.size()),#end</if>
+#end
+		</trim>
+	</insert>
+	 
+	<update id="update${className}" parameterType="${satpPackage}.entity.${className}">
+		update ${prefix}${tableName}
+		<set>
+#foreach($column in $columns)
+#if($column.columnName != $pk.columnName)
+			<if test="$column.attrname != null">${column.columnName}= #{$column.attrname}#if($velocityCount != $columns.size()), #end</if>
+#end
+#end
+		</set>
+		where ${pk.columnName} = #{${pk.attrname}}
+	</update>
+	
+	<delete id="delete${className}" parameterType="${satpPackage}.entity.${className}">
+		delete from ${prefix}${tableName} where ${pk.columnName} = #{${pk.attrname}}
+	</delete>
+	
+
+
+</mapper>
