@@ -30,7 +30,7 @@ public class SysGeneratorController {
 	@ResponseBody
 	@RequestMapping("/list")
 	public R list(@RequestParam Map<String, Object> params){
-		//查询列表数据
+		//查询列表数据23
 		Query query = new Query(params);
 		List<Map<String, Object>> list = sysGeneratorService.queryList(query);
 		int total = sysGeneratorService.queryTotal(query);
